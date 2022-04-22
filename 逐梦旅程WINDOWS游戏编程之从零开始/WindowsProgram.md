@@ -125,6 +125,8 @@ BOOL PlaySound(
 
 下用`SND_FILENAME|SND_ASYNC` 两个标识，标志第一个参数是文件名，并且声音是异步播放（播放完之后返回调用点）
 
+Returns **TRUE** if successful or **FALSE** otherwise.
+
 ### 4.实例程序Firstbolood
 
 
