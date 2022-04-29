@@ -1,3 +1,5 @@
+[高清彩图](https://blog.csdn.net/Raymond_King123/article/details/115661077)
+
 # 第三章 Unityshader基础
 
 ## 3.1 unity shader概述
@@ -57,7 +59,7 @@ Shader "ShaderName"{
 - 2D, 3D, Cube是三种纹理值，用一个 字符串 和后面的 花括号 制定， 一般为内置的纹理名称"red"等
   - 花括号用于 指定**纹理属性**， unity5.0后需要自己在 顶点着色器 编写计算相关 **纹理坐标** 的 代码
 
-<img src="UnityShader.assets/image-20220427091543453.png" alt="image-20220427091543453" style="zoom:80%;" />
+![image-20220429085336547](UnityShader.assets/image-20220429085336547.png)
 
 Properties 是为了让这些属性出现在材质面板中（补图）
 
@@ -239,6 +241,10 @@ UnityShader（ShaderLab）我们可以做到的远多于 一个 传统Shader
   - 本质上，UnityShader只有两种形式，<u>**顶点/片元着色器**</u> 和 固定函数着色器(5.2后也会被转化为前者)
 
   # 第四章 Shader所需的数学模型
+
+  ## 4.2笛卡尔坐标系
+
+  ![image-20220429085541418](UnityShader.assets/image-20220429085541418.png)
 
 
 
