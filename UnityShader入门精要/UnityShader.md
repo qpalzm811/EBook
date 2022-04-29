@@ -185,11 +185,60 @@ Shader "Custom/Simple Surface Shader"{
 }
 ```
 
+1. Surface Shder一样，Vertex/Fragment 也要定义在`CGPROGRAM` 和 `ENDCG`之间
+2. 不同：Vertex/Fragment**要写在Pass**语义块中，而不是SubShader中
 
+### 3.4.3 被抛弃的角落： 固定函数着色器 Fixed Function Shader
 
+对于老旧设备，GPU仅支持DirectX7、OpenGL 1.5 或者OpenGL ES 1.5，例如iPhone3**不支持可编程管线Shader**，需要用到
 
+```C#
+Shader  "Tutortial/Basic"{
+	Properties{
+		_Color {"Main Color". Color} = {1, 0.5, 0.5, 1}
+	}
+	SubShader{
+		Pass{
+			Material{
+				Diffuse { _Color }
+			}
+			Lighting On
+		}
+	}
+}
+```
 
+Fixed Function Shader定义在 Pass 语义块，相当于一些渲染设置，我们需要完全使用ShaderLab语法编写
 
+### 3.4.4 选择UnityShader形式的建议
+
+1. 如果是 **光源**打交道，推荐表面着色器 Surface Shader
+2. 如果是 光源少，例如只有一个平行光，推荐 顶点/片元着色器Vertex/Fragment Shader
+3. 如果有更多 **自定义效果**，推荐使用 顶点/片元着色器Vertex/Fragment Shader
+
+## 3.6 答疑解惑
+
+### 3.6.1 UnityShader != 真正Shader 
+
+UnityShader（ShaderLab）我们可以做到的远多于 一个 传统Shader
+
+|                          传统Shader                          |                    UnityShader(ShaderLab)                    |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+|         仅可编写特定Shader，如顶点着色器，片元着色器         |           一个文件中同时包含顶点着色器，片元着色器           |
+| 无法设置一些渲染设置，如是否开启混合，深度测试等<br>是另外代码设置的 |                   通过一行特定指令即可设置                   |
+|    冗长代码设置**输入输出**，小心处理输入输入位置对应关系    | 只需要特定语句块声明一些属性，便可依靠材质方便改变这些属性<br>对于模型自带的数据（顶点位置，纹理坐标，法线的等）提供直接访问的方法 |
+
+### 3.6.2 UnityShader和CG/HLSL关系
+
+- 通常CG代码是位于Pass语义块中的
+
+- 但是，之前说讲 **表面着色器SurfaceShader**的时候，说CG是写在**SubShader**中的
+
+  - 因为 表面着色器 会转化成 包含多个Pass的 顶点/片元着色器，以用于多种设备
+  - 我们可在导入设置面板上点击 *Show Generated Code*看到生成的真正的 顶点/片元着色器 代码
+  - 本质上，UnityShader只有两种形式，<u>**顶点/片元着色器**</u> 和 固定函数着色器(5.2后也会被转化为前者)
+
+  # 第四章 Shader所需的数学模型
 
 
 
