@@ -259,15 +259,100 @@ UnityShader（ShaderLab）我们可以做到的远多于 一个 传统Shader
 
 - 对三维笛卡尔坐标系，靠二维的顺时针180°后水平翻转，不能让坐标系重合
 - 三维坐标系，我们令两个坐标轴重合，第三条指向总是相反的。这种的就是不同的**旋向性（handedness）**
-- 
 
+<img src="UnityShader.assets/image-20220507105135496.png" alt="image-20220507105135496" style="zoom:80%;" />
 
+- **旋转的正方向：**用左手右手定则，确定旋转的正方向，大拇指指向旋转的轴正方向，四肢弯曲为正方向
+  - ![image-20220507112246813](UnityShader.assets/image-20220507112246813.png)
 
+- ![image-20220507141216930](UnityShader.assets/image-20220507141216930.png)
 
+  - 相同的视觉现象，数学描述却是不同的
 
+  - | 左手坐标 | X轴 +1 | Z轴 -4 | 旋转60°   |
+    | -------- | ------ | ------ | --------- |
+    | 右手坐标 | X轴 +1 | Z轴 +4 | 旋转-60度 |
 
+  -  大拇指指向Y轴，握拳看旋转正反
 
+### 4.2.4 Unity使用的坐标系
 
+1. Unity使用的是**左手坐标系（left-handed  coordinate space）**
+2. 但是观察空间，用到是**右手坐标系（right-handed coordinate space）**，摄像机前面方向是 **-Z轴**，与模型空间和世界空间相反，Z轴减少意味着场景深度增加（看绝对值就行）
+3. <img src="UnityShader.assets/image-20220507172120210.png" alt="image-20220507172120210" style="zoom:100%;" />
+
+### 4.2.5练习
+
+1. 3dMax的：X正指向右，Y指向前，Z指向上，什么坐标系？
+   1. 右手坐标系，大拇指x，食指y，中指z。从x握拳到z，大拇指指y轴
+2. 左手坐标西，有一点(0,0,1)，绕y轴正方向旋转+90°，坐标多少？右手呢
+   1. ![image-20220509094553496](UnityShader.assets/image-20220509094553496.png)
+   2. (-1, 0, 0)
+3. ![image-20220509095317761](UnityShader.assets/image-20220509095317761.png)
+   1. 摄像机观察空间中，球体Z值是：10
+   2. 摄像机模型空间下，球体Z值是：-10
+
+## 4.3 点和矢量
+
+- **点(Point)**，N维度空间中的一个位置，没有大小，宽度概念。
+- **矢量(vector)**，为了和**标量(scalar)**区分，指<u>n维空间中包含**模(magnitude)**和**方向(direction)**的有向线段</u>。
+  - 矢量通常被用于表示一个点的**偏移(displacement)**，是**相对量**，
+  - 所以<u>**模和方向不变，无论放在哪里，都是同一个矢量**</u>
+
+### 4.3.2 矢量运算
+
+#### 1. **矢量标量乘除**
+
+1. ![image-20220509105239590](UnityShader.assets/image-20220509105239590.png)
+
+#### 2. **矢量加减法**![image-20220509113209008](UnityShader.assets/image-20220509113209008.png)
+
+   1. ![image-20220509113350752](UnityShader.assets/image-20220509113350752.png)
+   2. 如果我们想要计算**点b对点a**的位移，就可以通过**b-a**得到
+
+#### 3. **矢量的模**![image-20220509133428905](UnityShader.assets/image-20220509133428905.png)
+
+#### 4. **单位矢量（unit vector）**：模为1的矢量，表示我们只关心**方向（direction）**
+
+   - 例如计算光照模型是，得到顶点的法线方向和光源方向
+
+   - 单位向量也被称为**归一化向量（normalized vector）**，对于非零向量，转化为单位向量的过程就叫归一化
+
+   - **归一化**![image-20220509135113959](UnityShader.assets/image-20220509135113959.png)
+   - 零向量：v=(0,0,0)，不可以被归一化
+   - 几何意义：![image-20220509140325886](UnityShader.assets/image-20220509140325886.png)
+   - 当我们遇到**法线方向**，**光源方向**等，这些不一定是单位向量，在使用前应当**归一化运算**
+
+#### 5. **矢量的点积（dot product）内积（inner product）**
+
+   1. $ a · b = (a_x, a_y, a_z) · (b_x, b_y, b_z) = a_x b_x+ a_y b_y+ a_z b_z $
+
+   2. 点积**几何意义**：**投影（projection）**
+
+   3. ![image-20220509145837083](UnityShader.assets/image-20220509145837083.png)
+
+   4. 点积结果的符号让我们知道两个矢量的方向关系：计算两个向量的夹角
+
+   5. 性质
+
+      1. ![image-20220509162618940](UnityShader.assets/image-20220509162618940.png)
+      2. 从性质三，**我们可以用叉积计算<u>模</u>**，一般，我们只想比较**<u>模</u>**大小，就不必开平方消耗性能了
+
+   6. 点积公式二：从三角代数出发，更具有几何意义
+
+      1. $ 公式： a · b = |a||b| \cos \theta  $
+      1. 从单位向量 $\hat{a} · \hat{b}  = \cos\theta= \frac{直角边}{斜边}$ 
+      1. <img src="UnityShader.assets/image-20220514062029408.png" alt="image-20220514062029408" style="zoom:80%;" />
+      1. ![image-20220514062109370](UnityShader.assets/image-20220514062109370.png)
+
+#### 6. 矢量的叉积（cross product）外积（outerproduct）
+
+1. 叉积结果是一个向量(vector)公式如下![image-20220514072216216](UnityShader.assets/image-20220514072216216.png)
+   1. 叉积不满足交换律$a \times b \neq b \times a$，
+   2. 不满足结合律$a \times (b \times c) \neq (a \times b) \times c$
+   3. 但是满足**反交换律** $a \times b = -(b \times a)$
+
+​     
 
 
 
