@@ -344,6 +344,7 @@ UnityShader（ShaderLab）我们可以做到的远多于 一个 传统Shader
       1. 从单位向量 $\hat{a} · \hat{b}  = \cos\theta= \frac{直角边}{斜边}$ 
       1. <img src="UnityShader.assets/image-20220514062029408.png" alt="image-20220514062029408" style="zoom:80%;" />
       1. ![image-20220514062109370](UnityShader.assets/image-20220514062109370.png)
+      1. $arcos$反余弦可求两个向量之间的角度
 
 #### 6. 矢量的叉积（cross product）外积（outerproduct）
 
@@ -351,8 +352,37 @@ UnityShader（ShaderLab）我们可以做到的远多于 一个 传统Shader
    1. 叉积不满足交换律$a \times b \neq b \times a$，
    2. 不满足结合律$a \times (b \times c) \neq (a \times b) \times c$
    3. 但是满足**反交换律** $a \times b = -(b \times a)$
+   4. **几何意义：**两个矢量叉积结果=**垂直**这两个矢量的新向量
+      1. ==新向量的模==：$ |a \times b = |a||b| \sin\theta$ （使用正弦sin）
+      2. 等价于平行四边形的面积公式：$S_{平行四边形}=|b|h= |b|(|a|\sin\theta) = |a||b|\sin\theta = |a \times b|$
+      3. 如果$a和b$ 平行，那么$a \times b = 零向量$ <u>得到零向量，不是0</u>
+      4. ![image-20220510115720181](UnityShader.assets/image-20220510115720181.png)
+      5. ==新向量的方向==：$a \times b $ 结果的方向根据左手 右手坐标系，并不影响叉积计算
+      5. 最常见的应用：计算垂直 平面、三角形的矢量。
 
-​     
+### 4.3.3 练习
+
+## 4.4矩阵
+
+### 4.4.1 矩阵定义
+
+$$
+M = \begin{bmatrix}
+   1 & 2 & 3 & 1 \\
+   4 & 5 & 6 & 1 \\
+   7 & 8 & 9 & 1 \\
+  \end{bmatrix}
+$$
+
+### 4.4.2 矢量连接起来
+
+- 矢量可以看做是$ n \times 1 $的列矩阵（column matrix）或者$1 \times n$的行矩阵（row matrix）
+
+### 4.4.3 矩阵运算
+
+#### 1.矩阵和标量的乘法
+
+
 
 
 
