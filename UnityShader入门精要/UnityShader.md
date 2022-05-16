@@ -615,7 +615,115 @@ $$
 ### 4.6.5 世界空间 world space
 
 1. 建立了我们关心的**最大空间**，在游戏中可以描述 **绝对位置**，指的就是世界坐标位置，通常将原点放在游戏空间中心
-2. ==Unity中==
+2. ==Unity中== 世界空间也用 左手坐标系，X，Y，Z轴固定不变，
+   1. 我们可以调整**Transform**组件中的**Position**属性改变模型位置，
+   2. 这里 **Position** 是相对于Transform的**父节点(parent)**的 **模型坐标空间**的原点定义的
+   3. 如果没有 **父节点** 那么 **Postion**就是世界坐标系的 位置
+   4. ![image-20220516104939405](UnityShader.assets/image-20220516104939405.png)
+3. ==顶点变换1== 将顶点坐标 从 模型空间 变换到 世界空间中，叫 **模型变换（model transform）**
+   1. ![image-20220516105900835](UnityShader.assets/image-20220516105900835.png)
+   2. 从上图信息，我们知道**世界空间**中，**Scale:(2,2,2) Rotation(0,150,0)Position(5,0,25)**
+   3. 变换顺序不可变：**1.缩放 2.旋转 3.平移**
+   4. ![image-20220516110353695](UnityShader.assets/image-20220516110353695.png)
+
+### 4.6.6 观察空间 （View space）
+
+1. 也被称为 **摄像机空间（Camera space）**，可以认为是 **<u>模型空间的一个特例</u>**：所以模型中，有一个非常特殊的模型，就是**摄像机**，所以他的模型空间，也就是观察空间，值得讨论
+   1. Unity用左手坐标系，Unity的Camera是**右手坐标系**，符合OpenGL
+   2. Camera +x指向右边，+y指向上方，-z指向前方
+   3. `Camera.cameraToWorldMatrix`和`Camera.worldToCameraMatrix`计算观察空间中的位置，需要注意这些差异
+2. **观察空间** 和 **屏幕空间** 不一样，前者三维空间，后者二维空间，二者之间需要 **投影（projection）**操作
+3. ==顶点变换2== 顶点坐标从 **世界空间** 到 **观察空间** **叫做观察变换（view transform)**
+   1. ![image-20220516114340181](UnityShader.assets/image-20220516114340181.png)
+   2. 两种方法，第一种就是之前的 **模型变换**提到的方法，构建 模型空间到世界空间**变换矩阵**，再**求逆** 得到**世界空间**到**观察空间**的 变换矩阵
+   3. 第二种：想象平移整个观察空间，<u>摄像机原点 移到 世界坐标的原点，坐标轴和 世界空间的 坐标轴 **重合**</u>
+      1. 由camera<u>当前</u>的transform组件，得知**先旋转(30,0,0)，后平移(0,10,-10)**，为了把camera和世界空间坐标轴重合，逆向变换，**先反方向平移(0,-10,10)，后反方向旋转(-30,0,0)**
+      2. ![image-20220516145354064](UnityShader.assets/image-20220516145354064.png)
+      3. 观察空间是**右手坐标系**，对Z轴进行取反操作
+      4. ![image-20220516145457855](UnityShader.assets/image-20220516145457855.png)
+      5. ![image-20220516145517184](UnityShader.assets/image-20220516145517184.png)
+
+### 4.6.7 裁剪空间 clip space
+
+1. ==顶点变换3== 裁剪空间clip space 也被称为 **齐次裁剪空间**，变换矩阵叫裁剪矩阵，也被称为 **投影矩阵（projection matrix）**
+2. **目标：** 方便地对 渲染图元进行裁剪。
+   1. **完全在空间内部**的图元将会被保留
+   2. **完全位于图外**的图元会被剔除
+   3. **与空间边界相交**的图元被裁减。
+   4. 这块空间由 **视锥体（view frustum）**决定
+   5. 视锥体决定了摄像机可以看到的空间。由 六个平面包围，这些平面被称为 **裁剪平面（clip planes）**
+3. 视锥体两种类型：**正交投影（orthographic projection）透视投影（perspective projection）**
+   1. ![image-20220516172811235](UnityShader.assets/image-20220516172811235.png)
+   2. 有两块裁剪平面很特殊：**近裁剪平面（near clip plane）远裁剪平面（far clip plane）**。决定了摄像机可以看到的深度范围。
+   3. ![image-20220516173550477](UnityShader.assets/image-20220516173550477.png)
+4. 投影矩阵两个目的：（投影指空间降维）
+   1. **为投影做准备**，他没有真正做投影，而是做准备，**真正的投影在齐次除法（homogeneous division）** 经过<u>投影矩阵后</u> 顶点的 $\omega$ 分量会有意义
+   2. **对x、y、z 分量进行缩放**。上面说用6个裁剪平面裁剪很麻烦，经过投影矩阵的缩放，可以直接使用 **$\omega$ 分量作为一个范围值**，如果x、y、z 都在范围内，说明在裁剪空间中
+
+#### 1.透视投影
+
+![image-20220516203054780](UnityShader.assets/image-20220516203054780.png)
+
+- 从Camera组件的**Field of View（FOV）**属性改变视锥体角度
+- Clipping Planes 代表 <u>近裁剪平面 远裁剪平面</u>距离摄像机远近，
+
+1. 由此求出 远裁剪平面 近裁剪平面 **高度**（垃圾学渣补充了个过程，一眼看不出来）
+   1. $$
+    \frac{0.5*nearClipPlaneHeight}{Near} = \tan{\frac{FOV}{2}} \\
+     nearClipPlaneHeight = 2 · Near· \tan \frac{FOV}{2} \\
+     farClipPlaneHeight = 2 · Far· \tan \frac{FOV}{2}
+    $$
+
+2. 缺乏横向信息，Unity中可通过 **Gamera.aspect** 修改摄像机**宽高比**计算
+
+   1. $$
+      Aspect = \frac{neraClipPlaneWidth}{neraClipPlaneWidth} \\
+      Aspect = \frac{farClipPlaneWidth}{farClipPlaneWidth} 
+      $$
+      
+      
+
+3. 透视投影矩阵如下：![image-20220516222055293](UnityShader.assets/image-20220516222055293.png)
+
+4. Unity中，我们针对的**观察空间** 是 **右手坐标系**， 列矩阵在矩阵右侧相乘，
+
+5. 变换后 Z 的分量将在$[-\omega, \omega]$之间，DirectX的API中，Z范围在$[0, \omega]$之间
+
+6. ![image-20220516222421808](UnityShader.assets/image-20220516222421808.png)
+
+7. **透视矩阵本质：**便是对 x、y、z 分量进行缩放，Z分量还做了一个平移
+
+8. **目的**：是为了方便裁剪
+
+9. 此时顶点的 $\omega$ 分量，从 1 变成了 z 分量取反 之后的结果
+
+10. 按照如下不等式可以判断顶点是否在视锥体内：
+
+    1. $$
+       -\omega <= x <= \omega\\
+       -\omega <= y <= \omega\\
+       -\omega <= z <= \omega
+       $$
+
+11. ![image-20220516223344057](UnityShader.assets/image-20220516223344057.png)
+
+12. 图中标注关键4点，四个分量发生了变化
+
+13. 并且空间从右手变成了左手坐标系，Z值越大，离摄像机越远
+
+#### 2.正交投影
+
+![image-20220516224332749](UnityShader.assets/image-20220516224332749.png)
+
+1. Camera组件中 **Size** 是竖直高度的一半，Near Far控制远近平面距离
+
+   1. 求出高度
+      $$
+      nearClipPlaneHeight = 2·Size \\
+      farClipPlaneHeight = nearClipPlaneHeight
+      $$
+
+   2. 
 
 
 
