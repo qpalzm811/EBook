@@ -837,12 +837,46 @@ $$
 
 ## 4.8 Unity Shader 内置变量（数学篇）
 
+可以在 UnityShaderVariables.cginc 文件中找到定义说明
 
+### 4.8.1 变换矩阵
 
+![image-20220517162726001](UnityShader.assets/image-20220517162726001.png) 
 
-​    
+1. 比较特殊 `UNITY_MATRIX_T_MV` 矩阵，对于**正交矩阵**，
 
+   1. 若`UNITY_MATRIX_MV`是正交矩阵，`UNITY_MATRIX_T_MV` 就是它的**逆矩阵**，
+   2. 可以直接用 `UNITY_MATRIX_T_MV` 将顶点 从 **观察空间** 变换到 **模型空间** 
+   3. **只有旋转** `UNITY_MATRIX_MV` 是正交矩阵
+   4. **只有旋转 和 统一缩放** `UNITY_MATRIX_MV` 逆矩阵就是 $\frac{1}{k}$`UNITY_MATRIX_T_MV` k是统一缩放系数
+   5. 对于 **方向矢量**，只需 3*3 的矩阵，并在使用前都**归一化处理**，**消除统一缩放影响**
 
+2. `UNITY_MATRIX_IT_MV` **法线变换** 需要 原本变换矩阵的  **逆转置矩阵**
+
+   1. 因此 `UNITY_MATRIX_IT_MV` 可以变换法线，从 模型空间 到观察空间
+
+   2. 但是我们只需要 **转置他** 得到 `UNITY_MATRIX_MV`的 **逆矩阵**
+
+   3.  **观察空间** 变换到 **模型空间** 两种方法
+
+      ```c#
+      // 方法一：使用 transpose 函数 对 UNITY_MATRIX_IT_MV 转置
+      // 得到 UNTIY_MATRIX_MV 的  逆矩阵  进行列矩阵乘法
+      //观察空间 变换到 模型空间
+      float4 modelPos = mul(transpose(UNITY_MATRIX_IT_MV),  viewPos);
+      
+      //方法二： 不用转置 transpose ， 交换 mul 乘法的位置，行矩阵乘法
+      //本质和 方法一一样
+      float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV)
+      ```
+
+### 4.8.2 摄像机屏幕参数
+
+![image-20220517165736494](UnityShader.assets/image-20220517165736494.png)
+
+![image-20220517165749440](UnityShader.assets/image-20220517165749440.png)
+
+## 4.9 答疑解惑
 
 
 
