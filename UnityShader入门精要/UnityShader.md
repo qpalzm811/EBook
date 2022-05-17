@@ -670,8 +670,8 @@ $$
 1. 由此求出 远裁剪平面 近裁剪平面 **高度**（垃圾学渣补充了个过程，一眼看不出来）
    1. $$
     \frac{0.5*nearClipPlaneHeight}{Near} = \tan{\frac{FOV}{2}} \\
-     nearClipPlaneHeight = 2 · Near· \tan \frac{FOV}{2} \\
-     farClipPlaneHeight = 2 · Far· \tan \frac{FOV}{2}
+       nearClipPlaneHeight = 2 · Near· \tan \frac{FOV}{2} \\
+       farClipPlaneHeight = 2 · Far· \tan \frac{FOV}{2}
     $$
 
 2. 缺乏横向信息，Unity中可通过 **Gamera.aspect** 修改摄像机**宽高比**计算
@@ -723,11 +723,119 @@ $$
       farClipPlaneHeight = nearClipPlaneHeight
       $$
 
-   2. 
+   2. 得到摄像机横纵比：**Aspect**
+      $$
+      nearClipPlaneWidth = Aspect · nearClipPlaneHeight \\
+      farClipPlaneHeight = nearClipPlaneHeight
+      $$
+
+   3. 确定正交投影矩阵，建立在Unity对坐标系假定上的：![image-20220517092935364](UnityShader.assets/image-20220517092935364.png)
+
+   4. ![image-20220517093038089](UnityShader.assets/image-20220517093038089.png)
+
+   5. 正交投影的 $\omega$ 分量依旧是1
+
+   6. ==区别==：最后一行上：透视投影 [0 0 -1 0] 正交投影 [0 0 0 1] **为齐次除法做准备**
+
+   7. ![image-20220517101842981](UnityShader.assets/image-20220517101842981.png)
+
+   8. ![image-20220517101948234](UnityShader.assets/image-20220517101948234.png)
+
+   9. ![image-20220517102004999](UnityShader.assets/image-20220517102004999.png)
+
+   10. ![image-20220517102017981](UnityShader.assets/image-20220517102017981-16527540195671.png)
+
+   11. 判断是否需要裁减![image-20220517102052422](UnityShader.assets/image-20220517102052422.png)
+
+### 4.6.8 屏幕空间
+
+==顶点变换4== ：完成了所有裁剪工作，就可以**真正的投影**了：<u>将视锥体投影到 **屏幕空间（screen space）**</u>
+
+- 我们将得到真正的像素位置，而不是虚拟的三维坐标
+1. 屏幕空间是一个二维空间，这个过程有两个步骤：
+
+   1. 标准 **齐次除法（homogeneous division）**也被称为**透视除法（perspective division）**：其实就是用 $\omega$ 分量，除以 $x,y,z$ 分量
+
+      1. OpenGL中，得到坐标叫做 **归一化的设备坐标（Normallized Device Coordinates， NDC）**
+      1. 经过 **齐次除法** 后，变换到一个**立方体**内
+      1. OpenGL标准： $x,y,z$ 分量范围[-1 , 1] **Unity使用**
+      1. DirectX中， $x,y$ 分量范围[-1 , 1]，$z$ 分量范围[0 , 1]
+      1. ![image-20220517111541864](UnityShader.assets/image-20220517111541864.png)
+      1. 齐次除法对正交投影没有影响，因为 $\omega$ 分量是1![image-20220517111604296](UnityShader.assets/image-20220517111604296.png)
+
+   1. 齐次除法后，根据变换后的 x 和 y 坐标 **映射输出 窗口对应的像素坐标**
+
+      1. Unity中 **左下（0,0）右上坐标（pixelWidth，PixelHeight）**
+      1. 现在的 x，y 坐标**范围都在[1,-1]**
+
+   1. 齐次除法和屏幕映射过程见下面公式：
+
+      1. $$
+         screen_x = \frac{clip_x · pixelWidth}{2·clip_w}+\frac{pixelWidth}{2} \\
+         screen_y = \frac{clip_y · pixelWidth}{2·clip_w}+\frac{pixelWidth}{2}
+         $$
+
+      1. Z 分量 通常用于 **深度缓存中**，传统方法是直接把 $\frac{clip_z}{Clip_{\omega}}$ **存入深度缓存**中。驱动生产商会选择最优存储格式
+
+      1. $Clip_{\omega}$也不会被抛弃，他完成了主要工作——**齐次除法中作为分母得到NDC**
+
+      1. 但他在后续还有重要作用：**透视矫正差值**
+
+   1. Unity中，**裁剪空间**到屏幕空间的转换，是unity完成的，顶点着色器只需要把顶点转换到 **裁剪空间**即可
+
+   1. 裁剪空间中鼻子位置：**（11.691， 15.311， 23.692， 27.31）**，设屏幕像素宽度400，高度300
+
+      1. 齐次除法，裁剪空间坐标投影到NDC中，再映射屏幕过程如下
+      1. ![image-20220517120117933](UnityShader.assets/image-20220517120117933.png)
 
 
+### 4.6.9 总结
 
+1. **顶点着色器** 最基本任务 把顶点坐标从 模型空间 转换到 裁剪空间，对应前三个变换过程
+2. **片元着色器** 通常可以得到该片元 在屏幕空间的像素位置。
+3. 此处只给出**一些最重要的坐标空间**，还有开发中遇到的其他空间，如 **切线空间（tangent space）**通常用于 **法线映射**
+4. ![image-20220517145612312](UnityShader.assets/image-20220517145612312.png)
 
+## 4.7 法线变换
+
+- **法线（normal）**也被称为 **法矢量（normal vector）**当我们变换顶点的时候，还需要变换**顶点法线**，以用于后续**计算光照**等（片元着色器）
+
+- **切线（tangent）**顶点携带的另一种信息，通常和纹理空间对齐，与法线方向垂直
+
+  - **切线是两个顶点之间的插值计算**得到的，我们可 **直接使用变换顶点的 变换矩阵 变换切线（tangent）**
+
+  - 使用 3*3 的变换矩阵（因为是向量，不考虑平移）可以得到变换后的 **切线方向**
+    $$
+    T_B =M_{A\rightarrow B}T_A
+    $$
+
+  - 但是 **法线就不行了** 直接用 $M_{A\rightarrow B}$ 变换的可能不与表面垂直
+
+  - ![image-20220517154425939](UnityShader.assets/image-20220517154425939.png)
+
+- 用 **数学约束条件** 推出矩阵：
+
+  1. 同一个顶点的切线 $T_A$ 和法线 $N_A$ 必须满足垂直条件:$ T_A · N_A = 0$
+
+  2. $T_B =M_{A\rightarrow B}T_A$ , 需找到矩阵G变换法线 $N_A$​ , 使得变换后的**法线和切线垂直**
+     $$
+     T_A · N_A = (M_{A\rightarrow B }T_A)·(G \  N_A) = 0
+     $$
+
+  3. ![image-20220517155235683](UnityShader.assets/image-20220517155235683.png)
+
+  4. $$
+     G = (M_{A\rightarrow B }^T)^{-1} = (M_{A\rightarrow B }^{-1})^T
+     $$
+
+  5. ==法线变换重点==：
+
+     1. 如果变换矩阵 $M_{A\rightarrow B }$  是**正交矩阵**，那么$M_{A\rightarrow B}^{-1} =M_{A\rightarrow B }^T$ , **变换顶点的 变换矩阵 可以直接 变换法线**
+        1. 如果 **只有旋转变换**，就是**正交矩阵**
+        2. 如果 **只有旋转 和 统一缩放**，就使用 **统一缩放系数k**变换矩阵：$ (M_{A\rightarrow B}^T)^{-1} = \frac{1}{k} M_{A\rightarrow B}$  以此避免求逆矩阵
+        3. 如果**带有非统一变换** 就老老实实求逆矩阵吧
+
+## 4.8 Unity Shader 内置变量（数学篇）
 
 
 
