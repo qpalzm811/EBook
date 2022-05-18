@@ -996,8 +996,40 @@ $$
                 | ---- | ------------ | -------- |
                 | z    | [-Near, Far] | [-1, 1]  |
                 | w    | [Near, Far]  | 1        |
-   
-                
+
+# 第五章 开始UnityShader学习之旅
+
+OpenGL的**渲染纹理（render Texture）**(0,0)点在左下角  DirectX (0,0) 点在左上角
+
+## 5.2 简单的顶点/片元着色器
+
+### 5.2.1 顶点/片元着色器 基本结构
+
+3.3提到了UnityShader的基本结构，包含了 Shader、Properties、SubShader、Fallback语义块
+
+![image-20220518195235835](UnityShader.assets/image-20220518195235835.png)
+
+最重要的就是**Pass语义块**，大部分代码都写在这里
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
