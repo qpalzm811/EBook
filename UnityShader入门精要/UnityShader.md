@@ -1058,15 +1058,55 @@ OpenGL的**渲染纹理（render Texture）**(0,0)点在左下角  DirectX (0,0)
 6. 顶点着色器 **逐顶点调用** 片元着色器 **逐片元调用** 片元着色器输入 是 顶点着色器输出的插值
 7. nmd这段代码2019.4.38用不了
 
+### 5.2.4 如何使用属性
 
+材质和shader紧密联系，材质提供我们方便调节unityshader参数的方式，通过参数可以调整材质，这些参数就要写在 **Properties** 语义块中。
 
+想要在 材质面板 显示一个颜色拾取器，直接控制 模型 显示的颜色
 
+![image-20220523094825216](UnityShader.assets/image-20220523094825216.png)
 
+为了在CG代码访问 _Color,需要提前定义一个新的变量
 
+![image-20220523095231066](UnityShader.assets/image-20220523095231066.png)
 
+有的CG变量前会有一个**uniform** 关键字 例如 `uniform fixed4 _Color`
 
+uniform关键字 仅用于提供一些关于 该变量初始值是如何指定 存储 的相关信息，UnityShader中uniform关键词可以忽略。
 
+## 5.3 强大的援手：Unity提供的内置文件和变量
 
+### 5.3.1 内置包含文件
+
+**包含文件( include file)**，类似C++头文件，Unity中后缀是 `.cginc` 使用`#include` 指令包含：`#include "UnityCG.cginc"`
+
+![image-20220523101810027](UnityShader.assets/image-20220523101810027.png)
+
+![image-20220523102145509](UnityShader.assets/image-20220523102145509.png)
+
+![image-20220523102353358](UnityShader.assets/image-20220523102353358.png)
+
+![image-20220523102409009](UnityShader.assets/image-20220523102409009.png)
+
+### 5.3.2 内置的变量
+
+Unity还提供了 用于 访问时间、光照、雾效、环境光等目的变量，大多数位于 `UnityShaderVariables.cginc`
+
+## 5.4 Unity 提供的 CG/HLSL语义
+
+### 5.4.1 什么是语义（semantics）
+
+1. 这些是CG/HLSL提供的语义，DirectX中找到语义详细说明。
+2. 语义是 赋给 Shader 输入和输出的字符串，表达了这个参数的含义。
+3. 可以让Shader知道**从哪里读取数据**，并 **把数据输出到哪里**
+4. Unity为了方便对 **模型数据** 的传输，对一些语义特别含义规定，例如：
+   1. 顶点着色器输入结构体 a2f 用TEXCOORD0来描述texcoord，Unity会识别TEXCOORD0语义，把模型<u>第一组纹理坐标</u>填充到texcoord中。
+   2. 出现位置不同，语义含义也不同。v2f中，没有特殊含义，a2f就有：把模型第一组纹理坐标存储在该变量中。
+5. DirectX10之后，新的语义类型：**系统数值语义（system-value semantics）**这类都是 SV开头。
+   1. 在渲染流水线有特殊含义，用 `SV_POSITION` 语义修饰顶点着色器的 输出变量 pos，表示pos包含了可用于 光栅化 的变换后的顶点坐标（齐次裁剪坐标空间的坐标）
+      1. 用这些语义描述的变量，不可以随便赋值，流水线需要用他们 完成特定目的：引擎会用 `SV_POSITION`修饰的变量经过光栅化后显示在屏幕上。 
+      2. 同一个变量 不同的Shader里 用不同的语义修饰。例如 一些Shader 用 `POSITION` 而非`SV_POSITION`修饰 顶点着色器输出。
+      3. `SV_POSITION` 是DirectX10引入的系统数值语义，**大多平台和POSITION语义等价** ，但是如PS4必须用 `SV_POSITION` 修饰 顶点着色器的输出。
 
 
 
