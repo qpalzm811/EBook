@@ -1106,7 +1106,26 @@ Unity还提供了 用于 访问时间、光照、雾效、环境光等目的变�
    1. 在渲染流水线有特殊含义，用 `SV_POSITION` 语义修饰顶点着色器的 输出变量 pos，表示pos包含了可用于 光栅化 的变换后的顶点坐标（齐次裁剪坐标空间的坐标）
       1. 用这些语义描述的变量，不可以随便赋值，流水线需要用他们 完成特定目的：引擎会用 `SV_POSITION`修饰的变量经过光栅化后显示在屏幕上。 
       2. 同一个变量 不同的Shader里 用不同的语义修饰。例如 一些Shader 用 `POSITION` 而非`SV_POSITION`修饰 顶点着色器输出。
-      3. `SV_POSITION` 是DirectX10引入的系统数值语义，**大多平台和POSITION语义等价** ，但是如PS4必须用 `SV_POSITION` 修饰 顶点着色器的输出。
+      3. `SV_POSITION` 是DirectX10引入的系统数值语义，**大多平台和POSITION语义等价** ，但是如PS4必须用 `SV_POSITION` 修饰 顶点着色器的输出。还有 `COLOR`和`SV_Target`
+      4. 所以为了跨平台性，特殊含义变量，最好用 SV开头的语义
+
+### 5.4.2 Unity支持的语义
+
+![image-20220523223730396](UnityShader.assets/image-20220523223730396.png)
+
+![image-20220523223829819](UnityShader.assets/image-20220523223829819.png)
+
+![image-20220523223854295](UnityShader.assets/image-20220523223854295.png)
+
+### 5.4.3 如何定义复杂的变量类型
+
+![image-20220523224058619](UnityShader.assets/image-20220523224058619.png)
+
+- 5.7.1会给出建议，**一个语义可以使用的寄存器只能处理4个浮点值(float)**
+- 因此float3x4和float4x4需要更多空间
+  - 一种方法，变量拆分成多个变量，对于float4x4 拆成4个float4类型的变量，每个变量存一行数据
+
+## 5.5 Debug
 
 
 
