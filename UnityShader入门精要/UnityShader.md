@@ -1127,6 +1127,40 @@ Unity还提供了 用于 访问时间、光照、雾效、环境光等目的变�
 
 ## 5.5 Debug
 
+### 5.5.1 使用假彩色图像（false-color image）
+
+指的是 假彩色技术 生成的一种图像，与其对应的是 **真彩色图像（true-color image)**。假彩色图像可用于 可视化一些数据。如何用它对Shader调试？
+
+主要思想：把需要调试的变量 映射到[0,1] 之间，作为颜色输出到屏幕上，通过屏幕上像素判断。
+
+- 如果要一维数据，选择一个单独颜色分量，输出，把其他颜色分量置0。
+- 如果是多维数据，选择对它每个分量单独测试，或者 选择多个颜色分量输出
+
+上述代码使用Unity内置结构体—— *appdata_full* : 几乎包含了所有模型数据
+
+```C#
+struct appdata_full {
+    float4 vertex : POSITION;
+    float4 tangent : TANGENT;
+    float3 normal : NORMAL;
+    float4 texcoord : TEXCOORD0;　　//第一纹理坐标
+    float4 texcoord1 : TEXCOORD1;　　//第二纹理坐标
+    float4 texcoord2 : TEXCOORD2;　　//第三纹理坐标
+    float4 texcoord3 : TEXCOORD3;　　//第四纹理坐标
+    #if defined (SHADER_API_XBOX360)
+        half4 texcoord4 : TEXCOORD4;
+	half4 texcoord5 : TEXCOORD5;
+    #endif
+    fixed4 color : COLOR;//顶点颜色
+};
+```
+
+### 5.5.2 Visual Studio调试
+
+![image-20220525173108753](UnityShader.assets/image-20220525173108753.png)
+
+### 5.5.3 帧调试器 Frame Debugger
+
 
 
 
