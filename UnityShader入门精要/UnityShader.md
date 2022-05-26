@@ -1161,9 +1161,70 @@ struct appdata_full {
 
 ### 5.5.3 帧调试器 Frame Debugger
 
+![image-20220526091416433](UnityShader.assets/image-20220526091416433.png)
 
+Frame Debugger中，Draw开头的事件通常就是一个Draw Call
 
+## 5.6 小心渲染平台差异
 
+![image-20220526145520539](UnityShader.assets/image-20220526145520539.png)
+
+- 不仅要把 渲染结果 输出到屏幕上，还可以 输出到不同的渲染目标（Render Target）中
+- 我们需要 **渲染纹理（render texture）**保存这些结果——12章学习如何达到
+- DirectX平台 抗锯齿 会 纹理翻转
+- ![image-20220526150516959](UnityShader.assets/image-20220526150516959.png)
+
+### 5.6.2 Shader 语法差异
+
+![image-20220526151029931](UnityShader.assets/image-20220526151029931.png)
+
+![image-20220526151126672](UnityShader.assets/image-20220526151126672.png)
+
+DirectX 不支持 **顶点着色器** 中使用**tex2D**函数，tex2D是一个对纹理 进行采样的函数，DX不支持顶点阶段的tex2D运算，因为顶点着色器阶段Shader无法得到UV偏导。
+
+若是真想 **顶点阶段访问纹理** 使用**tex2Dlod** 代替：`#pragma target3.0 tex2Dlod(tex, float4(uv, 0, 0))`
+
+### 5.6.3 Shader语义差异
+
+- 使用 `SV_POSITION`描述顶点着色器 输出顶点位置
+- 使用`SV_Target` 描述片元着色器 输出颜色
+
+### 5.6.4 其他平台差异
+
+Unity官方文档：[平台特定的渲染差异](https://docs.unity3d.com/cn/2019.4/Manual/SL-PlatformDifferences.html)
+
+## 5.7 Shader简洁之道
+
+### 5.7.1 float、half 还是 fixed
+
+ ![image-20220526160911855](UnityShader.assets/image-20220526160911855.png)
+
+不一定和上述一致 [Unity手册数据精度](https://docs.unity.cn/cn/2020.3/Manual/SL-DataTypesAndPrecision.html)
+
+**field 精度1/256** 一般存颜色 
+
+**half** 精度约为 3 位小数 对于短矢量、方向、对象空间位置、高动态范围颜色非常有用
+
+- float、half、fixed 大多数现代桌面GPU等价。会把浮点用最高精度计算
+- 移动平台GPU 有不同的精度范围，确保真真的移动平台验证Shader
+- fixed精度 实际上只在 旧平台用，大多数现代GPU half==fixed
+
+**基本建议：使用尽可能 低 精度的类型**
+
+### 5.7.2 规范语法
+
+DirectX平台语法更严格，初始化时，使用变量类型匹配的参数，来初始化。
+
+### 5.7.3 避免不必要运算
+
+ ![image-20220526170734592](UnityShader.assets/image-20220526170734592.png)
+
+尽量减少在 Shader 上的计算，有寄存器上限，可以通过 预运算 提供更多数据
+
+- 什么是Shader Model？
+  - 微软提出的规范，**决定了 Shader 中 各个特性（feature） 的 能力（capability）**
+  - 这些特性和能力 体现在 Shader 能使用的 **运算指令数目、寄存器个数等方面**
+  - 
 
 
 
