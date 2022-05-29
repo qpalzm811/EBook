@@ -1242,13 +1242,13 @@ DirectX平台语法更严格，初始化时，使用变量类型匹配的参数�
 
 ### 5.7.5 不要除以 0
 
-![image-20220527081939437](C:\Users\w\AppData\Roaming\Typora\typora-user-images\image-20220527081939437.png)
+![image-20220527081939437](UnityShader.assets/image-20220527081939437.png)
 
 解决方法：**强制截取到 非0范围 || 或者用if语句判断除数是否为 0**
 
 ## 5.8 扩展阅读
 
-![image-20220527081959984](C:\Users\w\AppData\Roaming\Typora\typora-user-images\image-20220527081959984.png)
+![image-20220527081959984](UnityShader.assets/image-20220527081959984.png)
 
 # 第六章 Unity中的基础光照
 
