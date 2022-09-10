@@ -226,8 +226,69 @@ end
 
 ## 10. table 遍历有几种形式 有什么不同
 
-1. 当 key 为整数时，table 就可以当成数组来用。而且这个数组是一个 索引从1开始 ，没有固定长度，可以根据需要自动增长的数组，使用 ipairs 对数组进行遍历。
-2. 
+1. 第一种：pairs迭代器
+
+   - 对所有 键值key遍历 通过`next()`函数判断下一个元素
+
+   - 但是会出现随机遍历，可能不会按顺序遍历（
+
+   - ```lua
+     --pairs
+     t = {10, print, x = 12, k = "hi", 80, b = "cc", 999, collectgarbage("count")}
+     for k, v in pairs(t) do
+     	print(k, v)
+     end
+     ```
+
+   - 但随机主要是在元素增删后发生（k <-> x）
+
+     - 1	10
+       2	function: 00D46B10
+       k	hi
+       x	12
+     - 1	10
+       2	function: 00B56DB0
+       3	80
+       4	999
+       5	21.5947265625
+       x	12
+       k	hi
+       b	cc
+
+2. 第二种：ipairs迭代器
+
+   - 遍历列表（键必然是数字），确保元素是顺序出现的
+
+   - ```lua
+     --ipairs
+     t = {10, print, 12, "hi"}
+     for k, v in ipairs(t) do
+     	print(k, v)
+     end
+     ```
+
+   - 1	10
+     2	function: 00C66A10
+     3	12
+     4	hi
+
+   - ```lua
+     --ipairs
+     t = {10, print, 12, "hi", 8, 9, "DD"}
+     for k, v in ipairs(t) do
+     	print(k, v)
+     end
+     ```
+
+   - 1	10
+     2	function: 009E6770
+     3	12
+     4	hi
+     5	8
+     6	9
+     7	DD
+
+3. 
 
 ## 11. 详细描述下项目使用的 class 机制
 ## 12. 大体 了解下Lua的GC机制
