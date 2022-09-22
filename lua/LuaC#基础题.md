@@ -157,6 +157,8 @@ public class CShapeGC : MonoBehaviour
 }
 ```
 
+lua需要自己拉个tolua，[tolua5.3分支 ](https://github.com/topameng/tolua/tree/luac5.3) 里面的UGUI Demo [LuaFramework_UGUI_V2](https://github.com/jarjin/LuaFramework_UGUI_V2)   拉下来直接可以使用
+
 lua占用:
 
 ```c#
