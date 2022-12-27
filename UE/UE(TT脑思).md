@@ -74,7 +74,9 @@ WorldSetting窗口——GameMode——GameMode Override选择视角蓝图，Sele
 
 ## 7. 添加声音
 
+拖到中间，点自动播放就能一直有
 
+还能选择渐变衰退声音
 
 
 
