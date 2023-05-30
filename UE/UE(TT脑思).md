@@ -78,5 +78,8 @@ WorldSetting窗口——GameMode——GameMode Override选择视角蓝图，Sele
 
 还能选择渐变衰退声音
 
+## 8.动画
 
 
+
+![image-20221225135533446](UE(TT%E8%84%91%E6%80%9D).assets/image-20221225135533446.png)
