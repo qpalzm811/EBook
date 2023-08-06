@@ -1,0 +1,93 @@
+{
+  "main": {
+    "id": "3a7e798953385ec9",
+    "type": "split",
+    "children": [
+      {
+        "id": "631645553d224e64",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "逐梦旅程WINDOWS游戏编程之从零开始/WindowsProgram.md",
+            "mode": "preview",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "7c782ed82f597138",
+    "type": "split",
+    "children": [
+      {
+        "id": "71505714d38f2ece",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "88c458a99d1d6db8",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "fc2321897643e0f5",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4ab2510a855949ff",
+    "type": "split",
+    "children": [
+      {
+        "id": "7f5aa1303f2f5f6d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1322903c01e9baed",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "逐梦旅程WINDOWS游戏编程之从零开始/WindowsProgram.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": true,
+                "unlinkedCollapsed": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "active": "631645553d224e64",
+  "lastOpenFiles": [
+    "逐梦旅程WINDOWS游戏编程之从零开始/WindowsProgram.md"
+  ]
+}
